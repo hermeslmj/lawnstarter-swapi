@@ -4,23 +4,23 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-#TODO: inject as dependency
-use App\Services\PeopleService;
+use App\Services\FilmService;
 
-class PeopleController extends Controller
+class FilmController extends Controller
 {
-    protected $peopleService;
+    protected $filmService;
 
-    public function __construct(PeopleService $peopleService)
+    public function __construct(FilmService $filmService)
     {
-        $this->peopleService = $peopleService;
+        $this->filmService = $filmService;
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $response = $this->peopleService->getPeopleBySearch($request->query('searchTerm', ''));
+        $response = $this->filmService->getFilmsBySearch($request->query('searchTerm', ''));
         return response()->json($response);
     }
 
