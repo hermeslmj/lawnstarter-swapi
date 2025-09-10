@@ -1,15 +1,20 @@
-/* src/components/SearchResults.css */
-.results-section {
-  background-color: white;
+.results-header {
+  border-bottom: 1px solid #dcdcdc;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  font-weight: bold;
+  font-size: large;
 }
 
-.search-results-container h2 {
-  font-size: 1.1em;
+.search-results-container {
   margin-top: 0;
   margin-bottom: 20px;
   color: #333;
   padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
+}
+
+.results-list {
+  width: 100%;
 }
 
 .results-content {

@@ -10,8 +10,11 @@ export function meta({}: Route.MetaArgs) {
 import React, { useState } from 'react';
 import SearchForm from '../components/SearchForm/SearchForm';
 import SearchResults from '../components/SearchResults/SearchResults';
-import type { SearchType, SearchResult } from '../types/types';
-import '../app.css'; // You can keep the main layout CSS here or in App.css
+import type { SearchType, SearchResult, PeopleDTO, FilmDTO } from '../types/types';
+import { httpRequest } from "~/helpers/HttpHelper";
+
+import '../app.css'; 
+
 
 const HomePage: React.FC = () => {
   const [searchType, setSearchType] = useState<SearchType>('People');
@@ -25,33 +28,50 @@ const HomePage: React.FC = () => {
     setSearchTerm(term);
     setLoading(true);
     setError(null);
-    setResults([]); // Clear previous results
+    setResults([]); 
+    
 
-    try {
-      // Simulate an API call
-      console.log(`Simulating API call for ${term} in ${type}...`);
-      //await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-        const response = await fetch('http://localhost/api/films/show?id=3'); // Replace with your API endpoint
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const result = await response.json();
-
-      // In a real app, you'd fetch data here
-      // const response = await fetch(`/api/${type.toLowerCase()}?q=${term}`);
-      // if (!response.ok) throw new Error('Network response was not ok');
-      // const data = await response.json();
-      // setResults(data); // Assuming data is an array of SearchResult
-
-      // For this example, we always return zero matches
-      setResults([]);
-
-    } catch (err) {
-      console.error("Search failed:", err);
-      setError("Failed to fetch results. Please try again.");
-    } finally {
-      setLoading(false);
+    if(type === 'Movies') {
+      try {
+        //TODO: url should be in a config file
+        await httpRequest<FilmDTO[]>(`http://localhost/api/films/?searchTerm=${term}`).then((data) => {
+          var resultsArray: SearchResult[] = [];
+          if (data) {
+            data.map((film) => {
+              resultsArray.push({ id: film.uid, name: film.title });
+            });
+          }
+          setResults(resultsArray);
+        }).catch((err) => setError(err.message));
+      } catch (err) {
+        console.error("Search failed:", err);
+        setError("Failed to fetch results. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     }
+    if(type === 'People'){
+      try 
+      {
+        //TODO: url should be in a config file
+        await httpRequest<PeopleDTO[]>(`http://localhost/api/people/?searchTerm=${term}`)
+        .then((data) => {
+          var resultsArray: SearchResult[] = [];
+          if (data) {
+            data.map((person) => {
+              resultsArray.push({ id: person.uid, name: person.name });
+            });
+          }
+          setResults(resultsArray);
+        }).catch((err) => setError(err.message));
+      } catch (err) {
+        console.error("Search failed:", err);
+        setError("Failed to fetch results. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    }
+ 
   };
 
   return (
@@ -68,7 +88,7 @@ const HomePage: React.FC = () => {
           />
         </div>
         <div className="results-section">
-          {loading && <p>Loading results...</p>}
+          {loading && <p>Searching...</p>}
           {error && <p className="error-message">{error}</p>}
           {!loading && !error && (
             <SearchResults results={results} />
