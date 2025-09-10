@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+
+
+
+body {
+  font-family: Montserrat;
+  margin: 0;
+  background-color: #dcdcdc ;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.app-container {
+  background-color: #dcdcdc;
+  max-width: 720px;
+  overflow: hidden;
+}
+
+.header {
+  color: #5cb85c;
+  padding: 15px 20px;
+  margin: 0 0 15px;
+  text-align: center;
+
+  background-color: white;
+
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+}
+
+.main-content {
+  display: flex;
+}
+
+.search-section {
+  flex: 1;
+  padding: 30px;
+  border-right: 1px solid #eee;
+}
+
+.results-section {
+  flex: 2;
+  padding: 30px;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 20px;
+}
