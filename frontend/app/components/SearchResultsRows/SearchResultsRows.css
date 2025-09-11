@@ -16,15 +16,16 @@
   color: white;
   padding: 8px 15px;
   border: none;
-  border-radius: 9px;
+  border-radius: 9999px;
   cursor: pointer;
   text-transform: uppercase;
   font-weight: bold;
   line-height: normal;
   letter-spacing: normal;
   transition: background-color 0.2s ease;
+  font-size: 10px;
 }
 
 .details-button:hover {
-  background-color: #218838; /* Slightly darker green on hover */
+  background-color: #218838;
 }

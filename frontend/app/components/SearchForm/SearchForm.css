@@ -46,10 +46,15 @@
   font-style: normal;
   line-height: normal;
   letter-spacing: normal;
+  transition: background-color 0.2s ease;
 }
 
 .search-button:disabled {
-  background-color: #dcdcdc; /* Gray out the button when disabled */
+  background-color: #dcdcdc;
   cursor: not-allowed;
+}
+
+.search-button:hover:enabled {
+  background-color: #218838; 
 }
 
