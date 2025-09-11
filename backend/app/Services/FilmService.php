@@ -1,6 +1,9 @@
 <?php
+
 namespace App\Services;
+
 use Illuminate\Support\Facades\Http;
+
 use App\Dtos\FilmDTO;
 
 class FilmService
@@ -8,23 +11,23 @@ class FilmService
     public function getFilmsBySearch(string $searchTerm): array
     {
         #TODO: use env var to swapi url
-       $response = Http::get('https://www.swapi.tech/api/films/', [ 
-           'title' => $searchTerm
-       ]);
+        $response = Http::get('https://www.swapi.tech/api/films/', [
+            'title' => $searchTerm
+        ]);
 
-       $filmsListObj = json_decode($response->body(), true);
+        $filmsListObj = json_decode($response->body(), true);
 
-       $filmDTOArray = array_map(function ($film) {
+        $filmDTOArray = array_map(function ($film) {
             $characterData = $this->_getPersonDataForFilm($film['properties']['characters'] ?? []);
-           return new FilmDTO(
-               $film['uid'] ?? '',
-               $film['properties']['title'] ?? '',
-               $film['properties']['opening_crawl'] ?? '',
-               $characterData ?? []
-           );
-       }, $filmsListObj['result'] ?? []);
+            return new FilmDTO(
+                $film['uid'] ?? '',
+                $film['properties']['title'] ?? '',
+                $film['properties']['opening_crawl'] ?? '',
+                $characterData ?? []
+            );
+        }, $filmsListObj['result'] ?? []);
 
-       return $filmDTOArray;
+        return $filmDTOArray;
     }
 
     public function getFilmById(string $id)
@@ -42,16 +45,25 @@ class FilmService
 
     private function _getPersonDataForFilm(array $personUrls): array
     {
+
         $people = [];
-        foreach ($personUrls as $url) {
-            $response = Http::get($url);
-            $personObj = json_decode($response->body(), true);
+        $response = Http::pool(function ($pool) use ($personUrls) {
+            $requests = [];
+            foreach ($personUrls as $url) {
+                $requests[] = $pool->get($url);
+            }
+
+            return $requests;
+        });
+
+        foreach ($response as $res) {
+            $personObj = json_decode($res->body(), true);
             $people[] = [
                 'uid' => $personObj['result']['uid'] ?? '',
                 'name' => $personObj['result']['properties']['name'] ?? ''
             ];
         }
+
         return $people;
     }
 }
-

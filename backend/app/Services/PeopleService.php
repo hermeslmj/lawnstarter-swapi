@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
@@ -11,28 +12,28 @@ class PeopleService
     {
 
         #TODO: use env var to swapi url
-       $response = Http::get('https://www.swapi.tech/api/people/', [
-           'name' => $searchTerm
-       ]);
+        $response = Http::get('https://www.swapi.tech/api/people/', [
+            'name' => $searchTerm
+        ]);
 
-       $peopleListObj = json_decode($response->body(), true);
-  
-       $peopleDTOArray = array_map(function ($person) {
+        $peopleListObj = json_decode($response->body(), true);
+
+        $peopleDTOArray = array_map(function ($person) {
             //TODO: move it to a function that returns a PeopleDTO
             $movieData = $this->_getMoviesDataForPerson($person['properties']['films'] ?? []);
             return new PeopleDTO(
-               $person['uid'] ?? '',
-               $person['properties']['name'] ?? '',
-               $person['properties']['gender'] ?? '',
-               $person['properties']['eye_color'] ?? '',
-               $person['properties']['hair_color'] ?? '',
-               $person['properties']['height'] ?? '',
-               $person['properties']['mass'] ?? '',
-               $movieData
+                $person['uid'] ?? '',
+                $person['properties']['name'] ?? '',
+                $person['properties']['gender'] ?? '',
+                $person['properties']['eye_color'] ?? '',
+                $person['properties']['hair_color'] ?? '',
+                $person['properties']['height'] ?? '',
+                $person['properties']['mass'] ?? '',
+                $movieData
             );
-       }, $peopleListObj['result'] ?? []);
-     
-       return $peopleDTOArray;
+        }, $peopleListObj['result'] ?? []);
+
+        return $peopleDTOArray;
     }
 
     public function getPersonById(string $id)
@@ -56,15 +57,27 @@ class PeopleService
     private function _getMoviesDataForPerson(array $movieUrls): array
     {
         $movies = [];
-        foreach ($movieUrls as $url) {
-            $response = Http::get($url);
+
+        $responses = Http::pool(function ($pool) use ($movieUrls) {
+            $requests = [];
+            foreach ($movieUrls as $url) {
+                $requests[] = $pool->get($url);
+            }
+            return $requests;
+        });
+
+        foreach ($responses as $response) {
             if ($response->successful()) {
                 $movieData = $response->json()['result'] ?? null;
                 if ($movieData) {
-                    $movies[] = ['id' => $movieData['uid'], 'title' => $movieData['properties']['title'] ?? ''];
+                    $movies[] = [
+                        'uid' => $movieData['uid'],
+                        'title' => $movieData['properties']['title'] ?? ''
+                    ];
                 }
             }
         }
+
         return $movies;
     }
 }
