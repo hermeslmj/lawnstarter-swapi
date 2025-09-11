@@ -1,6 +1,7 @@
 // src/components/SearchResults.tsx
 import React from 'react';
 import type { SearchResult } from '../../types/types';
+import SearchResultsRow from '../SearchResultsRows/SearchResultsRows';
 import './SearchResults.css'; // Assuming you'll create a SearchResults.css
 
 interface SearchResultsProps {
@@ -10,7 +11,9 @@ interface SearchResultsProps {
 const SearchResults: React.FC<SearchResultsProps> = ({ results }) => {
   return (
     <div className="search-results-container">
-      <h2>Results</h2>
+      <div className='results-header'>
+        <h1>Results</h1>
+      </div>
       <div className="results-content">
         {results.length === 0 ? (
           <p className="no-matches">
@@ -19,11 +22,15 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results }) => {
             Use the form to search for People or Movies.
           </p>
         ) : (
-          <ul>
+          <div className='results-list'>
             {results.map((item) => (
-              <li key={item.id}>{item.name}</li>
+              <SearchResultsRow
+                key={item.id}
+                name={item.name}
+                onViewDetails={() => alert(`Viewing details for ${item.name}`)}
+              />
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>

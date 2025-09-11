@@ -1,21 +1,15 @@
 @import "tailwindcss";
 
-
-
-
 body {
   font-family: Montserrat;
-  margin: 0;
   background-color: #dcdcdc ;
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 100vh;
 }
 
 .app-container {
   background-color: #dcdcdc;
-  max-width: 720px;
+  width: 100%;
   overflow: hidden;
 }
 
@@ -24,9 +18,7 @@ body {
   padding: 15px 20px;
   margin: 0 0 15px;
   text-align: center;
-
   background-color: white;
-
   font-weight: bold;
   font-stretch: normal;
   font-style: normal;
@@ -39,14 +31,22 @@ body {
 }
 
 .search-section {
-  flex: 1;
-  padding: 30px;
+  width: 30%;
+  padding: 15px;
   border-right: 1px solid #eee;
+  background-color: white;
+  margin: 15px 15px 176px 104px;
+  border-radius: 10px;
+  box-shadow: 0 0.5px 1px 0 #848484bf;
 }
 
 .results-section {
-  flex: 2;
-  padding: 30px;
+  width: 40%;
+  background-color: white;
+  margin: 15px 105px 0 15px;
+  padding: 15px 15px 149.5px;
+  border-radius: 10px;
+  box-shadow: 0 0.5px 1px 0 #848484bf;
 }
 
 .error-message {

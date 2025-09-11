@@ -1,5 +1,5 @@
 // src/components/SearchForm.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { SearchType } from '../../types/types';
 import './SearchForm.css'; // Assuming you'll create a SearchForm.css
 
@@ -14,13 +14,26 @@ const SearchForm: React.FC<SearchFormProps> = ({
   initialSearchTerm,
   onSearch,
 }) => {
+  
   const [searchType, setSearchType] = useState<SearchType>(initialSearchType);
   const [searchTerm, setSearchTerm] = useState<string>(initialSearchTerm);
-
+  const [placeholderState, setPlaceholderState] = useState<string>('e.g. Chewbacca, Yoda, Boba Fett');
+  const [searchButtonEnabled, setSearchButtonEnabled] = useState<boolean>(false);
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSearch(searchType, searchTerm);
   };
+
+  useEffect(() => {
+    var placeholder = searchType === 'People' ? 'e.g. Chewbacca, Yoda, Boba Fett' : 'e.g. Star Wars, The Empire Strikes Back';
+    setPlaceholderState(placeholder);
+  }, [searchType]);
+
+ useEffect(() => {
+    setSearchButtonEnabled(searchTerm.trim().length > 0);
+  }, [searchTerm]);
+
 
   return (
     <div className="search-form-container">
@@ -48,12 +61,12 @@ const SearchForm: React.FC<SearchFormProps> = ({
         </div>
         <input
           type="text"
-          placeholder="e.g. Chewbacca, Yoda, Boba Fett"
+          placeholder={placeholderState}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="search-input"
         />
-        <button type="submit" className="search-button">
+        <button type="submit" className="search-button" disabled={!searchButtonEnabled}>
           SEARCH
         </button>
       </form>

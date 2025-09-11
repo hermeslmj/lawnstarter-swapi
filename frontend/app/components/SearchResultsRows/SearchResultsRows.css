@@ -1,0 +1,31 @@
+.search-results-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #c4c4c4;
+}
+
+.item-name {
+  color: #333;
+  font-weight: bold;
+}
+
+.details-button {
+  background-color: #28a745;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: bold;
+  line-height: normal;
+  letter-spacing: normal;
+  transition: background-color 0.2s ease;
+  font-size: 10px;
+}
+
+.details-button:hover {
+  background-color: #218838;
+}
