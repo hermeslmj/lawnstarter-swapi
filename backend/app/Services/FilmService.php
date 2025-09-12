@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 use App\Dtos\FilmDTO;
+use App\DTOs\PeopleDTO;
 
 class FilmService
 {
@@ -18,13 +20,26 @@ class FilmService
         $filmsListObj = json_decode($response->body(), true);
 
         $filmDTOArray = array_map(function ($film) {
+
+            $cacheKey = $film['uid'] ? 'film_id_' . $film['uid'] : null;
+
+            if ($cacheKey && ($cachedFilm = Cache::get($cacheKey))) {
+                return $cachedFilm;
+            }
+
             $characterData = $this->_getPersonDataForFilm($film['properties']['characters'] ?? []);
-            return new FilmDTO(
+            $filmDTO = new FilmDTO(
                 $film['uid'] ?? '',
                 $film['properties']['title'] ?? '',
                 $film['properties']['opening_crawl'] ?? '',
                 $characterData ?? []
             );
+
+            if ($cacheKey) {
+                Cache::put($cacheKey, $filmDTO, now()->addMinutes(10));
+            }
+
+            return $filmDTO;
         }, $filmsListObj['result'] ?? []);
 
         return $filmDTOArray;
@@ -32,20 +47,29 @@ class FilmService
 
     public function getFilmById(string $id)
     {
+        $cacheKey = 'film_id_' . $id;
+        $filmDTO = Cache::get($cacheKey);
+        if ($filmDTO !== null) {
+            return $filmDTO;
+        }
         $response = Http::get("https://www.swapi.tech/api/films/{$id}");
         $filmObj = json_decode($response->body(), true);
         $characterData = $this->_getPersonDataForFilm($filmObj['result']['properties']['characters'] ?? []);
-        return new FilmDTO(
+        $filmDTO = new FilmDTO(
             $filmObj['result']['uid'] ?? '',
             $filmObj['result']['properties']['title'] ?? '',
             $filmObj['result']['properties']['opening_crawl'] ?? '',
             $characterData ?? []
         );
+
+        // Store in cache for 10 minutes
+        Cache::put($cacheKey, $filmDTO, now()->addMinutes(10));
+
+        return $filmDTO;
     }
 
     private function _getPersonDataForFilm(array $personUrls): array
     {
-
         $people = [];
         $response = Http::pool(function ($pool) use ($personUrls) {
             $requests = [];

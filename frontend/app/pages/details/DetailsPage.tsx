@@ -31,7 +31,7 @@ const DetailsPage: React.FC = () => {
             setLoading(true);
             setError(null);
             try {
-                const response = await fetch(`http://localhost/api/${type}/show?id=${id}/`);
+                const response = await fetch(`http://localhost/api/${type}/show?id=${id}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
