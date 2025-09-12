@@ -4,13 +4,13 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use App\Dtos\PeopleDTO;
+use Illuminate\Support\Facades\Cache;
 
 
 class PeopleService
 {
     public function getPeopleBySearch(string $searchTerm): array
     {
-
         #TODO: use env var to swapi url
         $response = Http::get('https://www.swapi.tech/api/people/', [
             'name' => $searchTerm
@@ -19,9 +19,14 @@ class PeopleService
         $peopleListObj = json_decode($response->body(), true);
 
         $peopleDTOArray = array_map(function ($person) {
-            //TODO: move it to a function that returns a PeopleDTO
+            $cacheKey = $person['uid'] ? 'person_id_' . $person['uid'] : null;
+
+            if ($cacheKey && ($cachedPerson = Cache::get($cacheKey))) {
+                return $cachedPerson;
+            }
+
             $movieData = $this->_getMoviesDataForPerson($person['properties']['films'] ?? []);
-            return new PeopleDTO(
+            $personDTO = new PeopleDTO(
                 $person['uid'] ?? '',
                 $person['properties']['name'] ?? '',
                 $person['properties']['gender'] ?? '',
@@ -32,6 +37,12 @@ class PeopleService
                 $person['properties']['birth_year'] ?? '',
                 $movieData
             );
+
+            if ($cacheKey) {
+                Cache::put($cacheKey, $personDTO, now()->addMinutes(10));
+            }
+
+            return $personDTO;
         }, $peopleListObj['result'] ?? []);
 
         return $peopleDTOArray;
@@ -39,6 +50,12 @@ class PeopleService
 
     public function getPersonById(string $id)
     {
+        $cacheKey = 'person_id_' . $id;
+        $personDTO = Cache::get($cacheKey);
+        if ($personDTO !== null) {
+            return $personDTO;
+        }
+
         $response = Http::get("https://www.swapi.tech/api/people/{$id}");
         $personObj = json_decode($response->body(), true);
         $movieData = $this->_getMoviesDataForPerson($personObj['result']['properties']['films'] ?? []);
@@ -53,13 +70,17 @@ class PeopleService
             $personObj['result']['properties']['birth_year'] ?? '',
             $movieData
         );
+
+        // Store in cache for 10 minutes
+        Cache::put($cacheKey, $personDTO, now()->addMinutes(10));
+
         return $personDTO;
     }
 
     private function _getMoviesDataForPerson(array $movieUrls): array
     {
         $movies = [];
-
+        
         $responses = Http::pool(function ($pool) use ($movieUrls) {
             $requests = [];
             foreach ($movieUrls as $url) {
