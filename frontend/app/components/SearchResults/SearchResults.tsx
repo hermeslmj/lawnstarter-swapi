@@ -6,9 +6,11 @@ import './SearchResults.css'; // Assuming you'll create a SearchResults.css
 
 interface SearchResultsProps {
   results: SearchResult[];
+  type: 'people' | 'films';
 }
 
-const SearchResults: React.FC<SearchResultsProps> = ({ results }) => {
+const SearchResults: React.FC<SearchResultsProps> = ({ results, type }) => {
+
   return (
     <div className="search-results-container">
       <div className='results-header'>
@@ -27,7 +29,11 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results }) => {
               <SearchResultsRow
                 key={item.id}
                 name={item.name}
-                onViewDetails={() => alert(`Viewing details for ${item.name}`)}
+                onViewDetails={
+                  () => {
+                    window.location.href = `/details/${type}/${item.id}`;
+                  }
+                }
               />
             ))}
           </div>

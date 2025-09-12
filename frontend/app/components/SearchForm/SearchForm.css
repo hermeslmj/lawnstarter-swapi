@@ -9,6 +9,8 @@
   margin-bottom: 20px;
   display: flex;
   gap: 20px;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .radio-group label {
@@ -29,7 +31,7 @@
   border: 1px solid #dcdcdc;
   border-radius: 4px;
   margin-bottom: 20px;
-  font-size: 9px;
+  font-size: 14px;
 }
 
 .search-button {
@@ -38,7 +40,7 @@
   padding: 5px;
   border: none;
   border-radius: 10px;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
   width: 100%;
   font-weight: bold;

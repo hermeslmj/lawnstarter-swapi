@@ -26,7 +26,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
   };
 
   useEffect(() => {
-    var placeholder = searchType === 'People' ? 'e.g. Chewbacca, Yoda, Boba Fett' : 'e.g. Star Wars, The Empire Strikes Back';
+    var placeholder = searchType === 'people' ? 'e.g. Chewbacca, Yoda, Boba Fett' : 'e.g. Star Wars, The Empire Strikes Back';
     setPlaceholderState(placeholder);
   }, [searchType]);
 
@@ -44,8 +44,8 @@ const SearchForm: React.FC<SearchFormProps> = ({
             <input
               type="radio"
               value="People"
-              checked={searchType === 'People'}
-              onChange={() => setSearchType('People')}
+              checked={searchType === 'people'}
+              onChange={() => setSearchType('people')}
             />
             People
           </label>
@@ -53,8 +53,8 @@ const SearchForm: React.FC<SearchFormProps> = ({
             <input
               type="radio"
               value="Movies"
-              checked={searchType === 'Movies'}
-              onChange={() => setSearchType('Movies')}
+              checked={searchType === 'films'}
+              onChange={() => setSearchType('films')}
             />
             Movies
           </label>
