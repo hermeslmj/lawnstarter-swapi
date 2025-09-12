@@ -1,6 +1,7 @@
 services:
   web:
     image: nginx:latest # Using the default Nginx image with custom configuration.
+    container_name: swapi-nginx
     volumes:
       # Mount the application code for live updates
       - ./:/var/www
@@ -19,6 +20,7 @@ services:
 
   php-fpm:
     # For the php-fpm service, we will create a custom image to install the necessary PHP extensions and setup proper permissions.
+    container_name: swapi-php-fpm
     build:
       context: .
       dockerfile: ./docker/common/php-fpm/Dockerfile
@@ -47,6 +49,7 @@ services:
 
   workspace:
    # For the workspace service, we will also create a custom image to install and setup all the necessary stuff.
+    container_name: swapi-workspace
     build:
       context: .
       dockerfile: ./docker/development/workspace/Dockerfile
@@ -72,6 +75,7 @@ services:
 
   postgres:
     image: postgres:16
+    container_name: swapi-postgres
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     environment:
@@ -85,6 +89,7 @@ services:
 
   redis:
     image: redis:alpine
+    container_name: swapi-redis
     networks:
       - laravel-development
 
