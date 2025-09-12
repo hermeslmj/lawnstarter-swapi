@@ -5,7 +5,7 @@ import type { SearchType, SearchResult, PeopleDTO, FilmDTO } from '../types/type
 import { httpRequest } from "~/helpers/HttpHelper";
 
 const SearchPage: React.FC = () => {
-  const [searchType, setSearchType] = useState<SearchType>('People');
+  const [searchType, setSearchType] = useState<SearchType>('people');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -19,7 +19,7 @@ const SearchPage: React.FC = () => {
     setResults([]); 
     
 
-    if(type === 'Movies') {
+    if(type === 'films') {
       try {
         //TODO: url should be in a config file
         await httpRequest<FilmDTO[]>(`http://localhost/api/films/?searchTerm=${term}`).then((data) => {
@@ -38,7 +38,7 @@ const SearchPage: React.FC = () => {
         setLoading(false);
       }
     }
-    if(type === 'People'){
+    if(type === 'people'){
       try 
       {
         //TODO: url should be in a config file
@@ -63,27 +63,27 @@ const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="app-container">
-      <header className="header">
-        <h1>SWStarter</h1>
-      </header>
-      <div className="main-content">
-        <div className="search-section">
-          <SearchForm
-            initialSearchType={searchType}
-            initialSearchTerm={searchTerm}
-            onSearch={handleSearch}
-          />
+        <div className="app-container min-h-screen bg-gray-100 flex flex-col">
+          <header className="header bg-blue-900 text-white py-4 px-6">
+            <h1 className="text-2xl md:text-3xl font-bold text-center">SWStarter</h1>
+          </header>
+          <div className="main-content flex-1 flex flex-col md:flex-row gap-6 p-4 md:p-8">
+            <div className="search-section w-full md:w-1/3 mb-6 md:mb-0">
+              <SearchForm
+                initialSearchType={searchType}
+                initialSearchTerm={searchTerm}
+                onSearch={handleSearch}
+              />
+            </div>
+            <div className="results-section w-full md:w-2/3">
+              {loading && <p className="text-center text-gray-500">Searching...</p>}
+              {error && <p className="error-message text-red-600 text-center">{error}</p>}
+              {!loading && !error && (
+                <SearchResults results={results} type={searchType} />
+              )}
+            </div>
+          </div>
         </div>
-        <div className="results-section">
-          {loading && <p>Searching...</p>}
-          {error && <p className="error-message">{error}</p>}
-          {!loading && !error && (
-            <SearchResults results={results} />
-          )}
-        </div>
-      </div>
-    </div>
   );
 };
 export default SearchPage;

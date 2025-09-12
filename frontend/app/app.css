@@ -31,19 +31,16 @@ body {
 }
 
 .search-section {
-  width: 30%;
   padding: 15px;
   border-right: 1px solid #eee;
   background-color: white;
-  margin: 15px 15px 176px 104px;
   border-radius: 10px;
   box-shadow: 0 0.5px 1px 0 #848484bf;
+  max-height: 200px;
 }
 
 .results-section {
-  width: 40%;
   background-color: white;
-  margin: 15px 105px 0 15px;
   padding: 15px 15px 149.5px;
   border-radius: 10px;
   box-shadow: 0 0.5px 1px 0 #848484bf;

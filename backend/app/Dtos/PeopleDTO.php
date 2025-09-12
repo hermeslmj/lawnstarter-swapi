@@ -12,7 +12,7 @@ class PeopleDTO
     public string $haircolor;
     public string $height;
     public string $mass;
-
+    public string $birthYear;
     public array $movies;
 
     /**
@@ -33,6 +33,7 @@ class PeopleDTO
         string $haircolor,
         string $height,
         string $mass,
+        string $birthYear,
         array $movies
     ) {
         $this->uid = $uid;
@@ -42,6 +43,7 @@ class PeopleDTO
         $this->haircolor = $haircolor;
         $this->height = $height;
         $this->mass = $mass;
+        $this->birthYear = $birthYear;
         $this->movies = $movies;
     }
     

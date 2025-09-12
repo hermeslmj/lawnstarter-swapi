@@ -29,6 +29,7 @@ class PeopleService
                 $person['properties']['hair_color'] ?? '',
                 $person['properties']['height'] ?? '',
                 $person['properties']['mass'] ?? '',
+                $person['properties']['birth_year'] ?? '',
                 $movieData
             );
         }, $peopleListObj['result'] ?? []);
@@ -49,6 +50,7 @@ class PeopleService
             $personObj['result']['properties']['hair_color'] ?? '',
             $personObj['result']['properties']['height'] ?? '',
             $personObj['result']['properties']['mass'] ?? '',
+            $personObj['result']['properties']['birth_year'] ?? '',
             $movieData
         );
         return $personDTO;

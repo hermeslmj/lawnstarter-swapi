@@ -1,6 +1,6 @@
 // src/types.ts
 
-export type SearchType = 'People' | 'Movies';
+export type SearchType = 'people' | 'films';
 
 export interface SearchResult {
   id: string;
@@ -20,6 +20,7 @@ export type PeopleDTO = {
   haircolor: string;
   height: string;
   mass: string;
+  birthYear: string;
   movies: PersonFilmsData[];
 };
 
@@ -31,7 +32,7 @@ export type FilmCharactersData = {
 export type FilmDTO = {
   uid: string;
   title: string;
-  opening_crawl: string;
+  openingCrawl: string;
   characters: FilmCharactersData[];
 }
 
