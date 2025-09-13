@@ -36,3 +36,7 @@ export type FilmDTO = {
   characters: FilmCharactersData[];
 }
 
+export type ListDTO = {
+  uid: string;
+  title: string;
+};

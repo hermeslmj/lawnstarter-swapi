@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 
 use App\Dtos\FilmDTO;
 use App\DTOs\PeopleDTO;
+use App\Dtos\ListDTO;
 
 class FilmService
 {
@@ -20,26 +21,18 @@ class FilmService
         $filmsListObj = json_decode($response->body(), true);
 
         $filmDTOArray = array_map(function ($film) {
-
-            $cacheKey = $film['uid'] ? 'film_id_' . $film['uid'] : null;
-
+            $cacheKey = $film['uid'] ? 'list_film_id_' . $film['uid'] : null;
             if ($cacheKey && ($cachedFilm = Cache::get($cacheKey))) {
                 return $cachedFilm;
             }
-
-            $characterData = $this->_getPersonDataForFilm($film['properties']['characters'] ?? []);
-            $filmDTO = new FilmDTO(
+            $listFilmDto = new ListDTO(
                 $film['uid'] ?? '',
                 $film['properties']['title'] ?? '',
-                $film['properties']['opening_crawl'] ?? '',
-                $characterData ?? []
             );
-
             if ($cacheKey) {
-                Cache::put($cacheKey, $filmDTO, now()->addMinutes(10));
+                Cache::put($cacheKey, $listFilmDto, now()->addMinutes(10));
             }
-
-            return $filmDTO;
+            return $listFilmDto;
         }, $filmsListObj['result'] ?? []);
 
         return $filmDTOArray;
@@ -76,7 +69,6 @@ class FilmService
             foreach ($personUrls as $url) {
                 $requests[] = $pool->get($url);
             }
-
             return $requests;
         });
 

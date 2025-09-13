@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Dtos\ListDTO;
 use Illuminate\Support\Facades\Http;
 use App\Dtos\PeopleDTO;
 use Illuminate\Support\Facades\Cache;
@@ -18,34 +19,25 @@ class PeopleService
 
         $peopleListObj = json_decode($response->body(), true);
 
-        $peopleDTOArray = array_map(function ($person) {
-            $cacheKey = $person['uid'] ? 'person_id_' . $person['uid'] : null;
+        $listPeopleDTOArray = array_map(function ($person) {
+            $cacheKey = $person['uid'] ? 'list_person_id_' . $person['uid'] : null;
 
             if ($cacheKey && ($cachedPerson = Cache::get($cacheKey))) {
                 return $cachedPerson;
             }
-
-            $movieData = $this->_getMoviesDataForPerson($person['properties']['films'] ?? []);
-            $personDTO = new PeopleDTO(
+            
+            $peopleListDto = new ListDTO(
                 $person['uid'] ?? '',
                 $person['properties']['name'] ?? '',
-                $person['properties']['gender'] ?? '',
-                $person['properties']['eye_color'] ?? '',
-                $person['properties']['hair_color'] ?? '',
-                $person['properties']['height'] ?? '',
-                $person['properties']['mass'] ?? '',
-                $person['properties']['birth_year'] ?? '',
-                $movieData
             );
 
             if ($cacheKey) {
-                Cache::put($cacheKey, $personDTO, now()->addMinutes(10));
+                Cache::put($cacheKey, $peopleListDto, now()->addMinutes(10));
             }
 
-            return $personDTO;
+            return $peopleListDto;
         }, $peopleListObj['result'] ?? []);
-
-        return $peopleDTOArray;
+        return $listPeopleDTOArray;
     }
 
     public function getPersonById(string $id)
