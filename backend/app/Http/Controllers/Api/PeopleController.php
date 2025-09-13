@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Models\QueryLogs;
 use App\Services\PeopleService;
-use App\Jobs\UpdateStatics;
+
 
 class PeopleController extends Controller
 {
@@ -31,6 +31,8 @@ class PeopleController extends Controller
         $queryLog->query = $request->fullUrl();;
         $queryLog->execution_time = number_format($executionTime, 5);
         $queryLog->save();
+        
+        
         return response()->json($response);
     }
 
