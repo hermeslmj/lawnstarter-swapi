@@ -1,11 +1,10 @@
 .details-page-container {
     background-color: white;
-    border-radius: 8px;
+    border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 30px;
-    margin: 40px auto;
+    margin: 0px auto;
     max-width: 900px;
-    font-family: Arial, sans-serif;
 }
 .main-title {
     font-size: 18px;

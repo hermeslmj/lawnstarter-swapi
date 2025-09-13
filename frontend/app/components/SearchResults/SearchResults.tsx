@@ -18,11 +18,11 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, type }) => {
       </div>
       <div className="results-content">
         {results.length === 0 ? (
-          <p className="no-matches">
+          <div className="no-matches flex items-center justify-center min-h-[40vh] text-lg text-gray-600">
             There are zero matches.
             <br />
             Use the form to search for People or Movies.
-          </p>
+          </div>
         ) : (
           <div className='results-list'>
             {results.map((item) => (

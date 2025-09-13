@@ -63,27 +63,23 @@ const SearchPage: React.FC = () => {
   };
 
   return (
-        <div className="app-container min-h-screen bg-gray-100 flex flex-col">
-          <header className="header bg-blue-900 text-white py-4 px-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-center">SWStarter</h1>
-          </header>
-          <div className="main-content flex-1 flex flex-col md:flex-row gap-6 p-4 md:p-8">
+          <>
             <div className="search-section w-full md:w-1/3 mb-6 md:mb-0">
               <SearchForm
                 initialSearchType={searchType}
                 initialSearchTerm={searchTerm}
                 onSearch={handleSearch}
+                loading={loading}
               />
             </div>
             <div className="results-section w-full md:w-2/3">
               {loading && <p className="text-center text-gray-500">Searching...</p>}
               {error && <p className="error-message text-red-600 text-center">{error}</p>}
               {!loading && !error && (
-                <SearchResults results={results} type={searchType} />
+                <SearchResults results={results} type={searchType}  />
               )}
             </div>
-          </div>
-        </div>
+          </>
   );
 };
 export default SearchPage;
