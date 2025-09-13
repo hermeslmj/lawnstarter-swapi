@@ -1,5 +1,3 @@
-// src/types.ts
-
 export type SearchType = 'people' | 'films';
 
 export interface SearchResult {
@@ -40,3 +38,22 @@ export type ListDTO = {
   uid: string;
   title: string;
 };
+
+export type SearchResultsProps = {
+  results: SearchResult[];
+  type: 'people' | 'films';
+}
+
+export type SearchResultsRowProps = {
+  name: string;
+  onViewDetails: () => void;
+}
+
+export type SearchFormProps = {
+  initialSearchType: SearchType;
+  initialSearchTerm: string;
+  onSearch: (type: SearchType, term: string) => void;
+  loading?: boolean;
+}
+
+export type ItemDetails = PeopleDTO | FilmDTO;

@@ -1,14 +1,6 @@
-// src/components/SearchForm.tsx
 import React, { useEffect, useState } from 'react';
-import type { SearchType } from '../../types/types';
-import './SearchForm.css'; // Assuming you'll create a SearchForm.css
-
-interface SearchFormProps {
-  initialSearchType: SearchType;
-  initialSearchTerm: string;
-  onSearch: (type: SearchType, term: string) => void;
-  loading?: boolean; // Optional loading prop
-}
+import type { SearchFormProps, SearchType } from '../../types/types';
+import './SearchForm.css';
 
 const SearchForm: React.FC<SearchFormProps> = ({
   initialSearchType,

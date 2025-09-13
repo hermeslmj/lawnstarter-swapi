@@ -1,11 +1,6 @@
-// src/components/SearchResultsRow.tsx
 import React from 'react';
-import './SearchResultsRows.css'; // Create this CSS file
-
-interface SearchResultsRowProps {
-  name: string;
-  onViewDetails: () => void; // Function to call when "See Details" is clicked
-}
+import './SearchResultsRows.css';
+import type { SearchResultsRowProps } from '~/types/types';
 
 const SearchResultsRow: React.FC<SearchResultsRowProps> = ({ name, onViewDetails }) => {
   return (

@@ -1,13 +1,7 @@
-// src/components/SearchResults.tsx
 import React from 'react';
-import type { SearchResult } from '../../types/types';
+import type { SearchResult, SearchResultsProps } from '../../types/types';
 import SearchResultsRow from '../SearchResultsRows/SearchResultsRows';
-import './SearchResults.css'; // Assuming you'll create a SearchResults.css
-
-interface SearchResultsProps {
-  results: SearchResult[];
-  type: 'people' | 'films';
-}
+import './SearchResults.css';
 
 const SearchResults: React.FC<SearchResultsProps> = ({ results, type }) => {
 

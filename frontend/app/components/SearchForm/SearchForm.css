@@ -22,7 +22,7 @@
 
 .radio-group input[type="radio"] {
   margin-right: 8px;
-  transform: scale(1.2); /* Make radio buttons a bit larger */
+  transform: scale(1.2);
 }
 
 .search-input {

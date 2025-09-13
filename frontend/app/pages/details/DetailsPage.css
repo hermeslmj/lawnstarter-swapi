@@ -71,3 +71,7 @@
 span:not(:last-of-type)::after {
   content: ", "; 
 }
+
+.details-section pre {
+    font-family: inherit;
+}

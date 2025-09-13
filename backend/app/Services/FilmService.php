@@ -19,7 +19,6 @@ class FilmService
         ]);
 
         $filmsListObj = json_decode($response->body(), true);
-
         $filmDTOArray = array_map(function ($film) {
             $cacheKey = $film['uid'] ? 'list_film_id_' . $film['uid'] : null;
             if ($cacheKey && ($cachedFilm = Cache::get($cacheKey))) {
@@ -54,10 +53,7 @@ class FilmService
             $filmObj['result']['properties']['opening_crawl'] ?? '',
             $characterData ?? []
         );
-
-        // Store in cache for 10 minutes
         Cache::put($cacheKey, $filmDTO, now()->addMinutes(10));
-
         return $filmDTO;
     }
 
@@ -79,7 +75,6 @@ class FilmService
                 'name' => $personObj['result']['properties']['name'] ?? ''
             ];
         }
-
         return $people;
     }
 }

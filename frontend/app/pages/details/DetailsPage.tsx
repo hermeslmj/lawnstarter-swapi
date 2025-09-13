@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
-import type { PeopleDTO, FilmDTO } from '~/types/types';
+import type { PeopleDTO, FilmDTO, ItemDetails } from '~/types/types';
 import './DetailsPage.css';
 
-type ItemDetails = PeopleDTO | FilmDTO;
 
 function isPeopleDTO(obj: any): obj is PeopleDTO {
   return obj && typeof obj === 'object' && 'gender' in obj && 'eyecolor' in obj;
@@ -14,7 +13,6 @@ function isFilmDTO(obj: any): obj is FilmDTO {
 }
 
 const DetailsPage: React.FC = () => {
-    // useParams returns string or undefined, so we type them explicitly
     const { type, id } = useParams<{ type: string; id: string }>();
     const [details, setDetails] = useState<ItemDetails | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -27,7 +25,6 @@ const DetailsPage: React.FC = () => {
                 setLoading(false);
                 return;
             }
-
             setLoading(true);
             setError(null);
             try {
@@ -37,7 +34,7 @@ const DetailsPage: React.FC = () => {
                 }
                 const data: ItemDetails = await response.json();
                 setDetails(data);
-            } catch (err: any) { // Type 'any' for err in catch block if not specific error type is known
+            } catch (err: any) {
                 setError(err.message);
             } finally {
                 setLoading(false);
@@ -45,7 +42,7 @@ const DetailsPage: React.FC = () => {
         };
 
         fetchDetails();
-    }, [type, id]); // Re-run effect if type or id changes
+    }, [type, id]);
 
     if (loading) {
         return <div className="details-page-container flex items-center justify-center min-h-[40vh] text-lg text-gray-600">Loading...</div>;
@@ -59,8 +56,6 @@ const DetailsPage: React.FC = () => {
         return <div className="details-page-container flex items-center justify-center min-h-[40vh] text-lg text-gray-600">No details found.</div>;
     }
 
-
-    // Function to render details based on the type
     const renderDetails = () => {
         if (isPeopleDTO(details)) {
             return (
@@ -88,7 +83,7 @@ const DetailsPage: React.FC = () => {
         }
         return null;
     };
-    // Function to render related items (e.g., movies for people, or characters/planets for films)
+
     const renderRelated = () => {
         if (isPeopleDTO(details) && details.movies && details.movies.length > 0) {
             return (
@@ -125,7 +120,6 @@ const DetailsPage: React.FC = () => {
                 </div>
             );
         }
-        // Add more conditions for films related to planets, starships, etc.
         return null;
     };
 
