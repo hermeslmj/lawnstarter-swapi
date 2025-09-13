@@ -7,12 +7,14 @@ interface SearchFormProps {
   initialSearchType: SearchType;
   initialSearchTerm: string;
   onSearch: (type: SearchType, term: string) => void;
+  loading?: boolean; // Optional loading prop
 }
 
 const SearchForm: React.FC<SearchFormProps> = ({
   initialSearchType,
   initialSearchTerm,
   onSearch,
+  loading
 }) => {
   
   const [searchType, setSearchType] = useState<SearchType>(initialSearchType);
@@ -67,7 +69,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
           className="search-input"
         />
         <button type="submit" className="search-button" disabled={!searchButtonEnabled}>
-          SEARCH
+          {loading ? 'SEARCHING...' : 'SEARCH'}
         </button>
       </form>
     </div>

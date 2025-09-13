@@ -26,8 +26,12 @@ type RouteFiles = {
     id: "root";
     page: "/" | "/details/:type/:id";
   };
-  "routes/home.tsx": {
-    id: "routes/home";
+  "./pages/layout/PageLayout.tsx": {
+    id: "pages/layout/PageLayout";
+    page: "/" | "/details/:type/:id";
+  };
+  "pages/SearchPage.tsx": {
+    id: "pages/SearchPage";
     page: "/";
   };
   "pages/details/DetailsPage.tsx": {

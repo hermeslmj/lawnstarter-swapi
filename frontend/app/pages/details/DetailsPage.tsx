@@ -48,15 +48,15 @@ const DetailsPage: React.FC = () => {
     }, [type, id]); // Re-run effect if type or id changes
 
     if (loading) {
-        return <div className="details-page-container">Loading...</div>;
+        return <div className="details-page-container flex items-center justify-center min-h-[40vh] text-lg text-gray-600">Loading...</div>;
     }
 
     if (error) {
-        return <div className="details-page-container">Error: {error}</div>;
+        return <div className="details-page-container flex items-center justify-center min-h-[40vh] text-lg text-gray-600">Error: {error}</div>;
     }
 
     if (!details) {
-        return <div className="details-page-container">No details found.</div>;
+        return <div className="details-page-container flex items-center justify-center min-h-[40vh] text-lg text-gray-600">No details found.</div>;
     }
 
 
@@ -132,10 +132,11 @@ const DetailsPage: React.FC = () => {
 
     return (
         <div className="details-page-container">
-            <h1 className="main-title">
-                {isFilmDTO(details) ? details.title : details.name}
-            </h1>
-
+            <div>
+                <h1 className="main-title">
+                    {isFilmDTO(details) ? details.title : details.name}
+                </h1>    
+            </div>
             <div className="content-wrapper">
                 <div className="details-section">
                     {renderDetails()}
