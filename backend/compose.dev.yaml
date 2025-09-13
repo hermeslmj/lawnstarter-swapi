@@ -92,6 +92,22 @@ services:
     container_name: swapi-redis
     networks:
       - laravel-development
+  
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../frontend/Dockerfile
+    container_name: swapi-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      -  ./:/var/www
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - laravel-development
+    depends_on:
+      - php-fpm
 
 networks:
   laravel-development:

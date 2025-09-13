@@ -8,7 +8,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Services\StatisticsService;
 
-class UpdateStatics implements ShouldQueue
+class UpdateStaticsJob implements ShouldQueue
 {
     use Dispatchable, Queueable, InteractsWithQueue;
 
