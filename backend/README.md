@@ -13,7 +13,6 @@ docker compose -f compose.dev.yaml up -d
 ```sh
 docker compose -f compose.dev.yaml exec workspace bash
 composer install
-php artisan key:generate
 ```
 
 ### 3. Run Migration
@@ -22,11 +21,19 @@ php artisan key:generate
 php artisan migrate
 ```
 
+## Usefull commands
 
-### 4. How to connect to redis
+### 1. How to connect to redis
+```sh
 docker exec -it swapi-redis redis-cli
-
-
-### 5. How to start manually the queue and schedule
+```
+### 2. How to start manually the queue and schedule
+```sh
 php artisan schedule:work
 php artisan queue:work
+```
+### 3. Connect to postgres
+```sh
+docker exec -it swapi-postgres bash
+psql -U laravel -d app
+```
