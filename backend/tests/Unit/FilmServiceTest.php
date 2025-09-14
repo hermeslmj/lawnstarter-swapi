@@ -3,24 +3,36 @@
 namespace Tests\Unit;
 
 use App\Services\FilmService;
+use App\Services\CacheService;
 use App\Dtos\FilmDTO;
 use App\Dtos\ListDTO;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
+use Mockery;
 
 class FilmServiceTest extends TestCase
 {
     private FilmService $filmService;
+    private $mockCacheService;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->filmService = new FilmService();
+        $this->mockCacheService = Mockery::mock(CacheService::class);
+        $this->filmService = new FilmService($this->mockCacheService);
+    }
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
     }
 
     public function test_get_films_by_search_returns_success_response()
     {
+        $this->mockCacheService->shouldReceive('get')->andReturn(null);
+        $this->mockCacheService->shouldReceive('set')->andReturn(true);
+
         Http::fake([
             '*' => Http::response([
                 'result' => [
@@ -42,23 +54,40 @@ class FilmServiceTest extends TestCase
         $this->assertEquals('A New Hope', $response->data[0]->title);
     }
 
-    public function test_get_films_by_search_returns_error_on_api_failure()
+    public function test_get_films_by_search_returns_from_cache()
     {
+        $cachedFilm = new ListDTO('1', 'A New Hope');
+        $this->mockCacheService
+            ->shouldReceive('get')
+            ->with('list_film_id_1')
+            ->andReturn($cachedFilm);
+
         Http::fake([
-            '*' => Http::response(null, 500)
+            '*' => Http::response([
+                'result' => [
+                    [
+                        'uid' => '1',
+                        'properties' => [
+                            'title' => 'A New Hope'
+                        ]
+                    ]
+                ]
+            ], 200)
         ]);
 
         $response = $this->filmService->getFilmsBySearch('hope');
 
-        $this->assertFalse($response->success);
-        $this->assertEquals([], $response->data);
+        $this->assertTrue($response->success);
+        $this->assertIsArray($response->data);
+        $this->assertInstanceOf(ListDTO::class, $response->data[0]);
+        $this->assertEquals('A New Hope', $response->data[0]->title);
     }
 
     public function test_get_film_by_id_returns_from_cache()
     {
         $cachedFilm = new FilmDTO('1', 'Cached Film', 'Opening crawl', []);
-        Cache::shouldReceive('get')
-            ->once()
+        $this->mockCacheService
+            ->shouldReceive('get')
             ->with('film_id_1')
             ->andReturn($cachedFilm);
 
@@ -71,8 +100,8 @@ class FilmServiceTest extends TestCase
 
     public function test_get_film_by_id_returns_from_api()
     {
-        Cache::shouldReceive('get')->andReturn(null);
-        Cache::shouldReceive('put')->once();
+        $this->mockCacheService->shouldReceive('get')->andReturn(null);
+        $this->mockCacheService->shouldReceive('set')->once()->andReturn(true);
 
         Http::fake([
             '*' => Http::response([
@@ -96,7 +125,8 @@ class FilmServiceTest extends TestCase
 
     public function test_get_film_by_id_returns_error_on_api_failure()
     {
-        Cache::shouldReceive('get')->andReturn(null);
+        $this->mockCacheService->shouldReceive('get')->andReturn(null);
+
         Http::fake([
             '*' => Http::response(null, 404)
         ]);

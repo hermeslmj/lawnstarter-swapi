@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Exception;
 use App\Dtos\FilmDTO;
@@ -14,11 +13,13 @@ class FilmService
 {
     protected $swapiBaseUrl;
     protected $swapiFilmsUrl;
+    protected $cacheService;
 
-    public function __construct()
+    public function __construct(CacheService $cacheService)
     {
         $this->swapiBaseUrl = env('APP_SWAPI_URL');
         $this->swapiFilmsUrl = "{$this->swapiBaseUrl}films/";
+        $this->cacheService = $cacheService;
     }
 
     public function getFilmsBySearch(string $searchTerm): ServiceResponse
@@ -36,15 +37,20 @@ class FilmService
             $filmsListObj = json_decode($response->body(), true);
             $filmDTOArray = array_map(function ($film) {
                 $cacheKey = $film['uid'] ? 'list_film_id_' . $film['uid'] : null;
-                if ($cacheKey && ($cachedFilm = Cache::get($cacheKey))) {
-                    return $cachedFilm;
+                if ($cacheKey) {
+                    $cachedFilm = $this->cacheService->get($cacheKey);
+                    if ($cachedFilm) {
+                        return $cachedFilm;
+                    }
                 }
+                
                 $listFilmDto = new ListDTO(
                     $film['uid'] ?? '',
                     $film['properties']['title'] ?? '',
                 );
+
                 if ($cacheKey) {
-                    Cache::put($cacheKey, $listFilmDto, now()->addMinutes(10));
+                    $this->cacheService->set($cacheKey, $listFilmDto);
                 }
                 return $listFilmDto;
             }, $filmsListObj['result'] ?? []);
@@ -59,7 +65,8 @@ class FilmService
     public function getFilmById(string $id): ServiceResponse
     {
         $cacheKey = 'film_id_' . $id;
-        $filmDTO = Cache::get($cacheKey);
+        $filmDTO = $this->cacheService->get($cacheKey);
+        
         if ($filmDTO !== null) {
             return new ServiceResponse($filmDTO, 'Film retrieved from cache', true);
         }
@@ -80,7 +87,7 @@ class FilmService
                 $characterData ?? []
             );
             
-            Cache::put($cacheKey, $filmDTO, now()->addMinutes(10));
+            $this->cacheService->set($cacheKey, $filmDTO);
             return new ServiceResponse($filmDTO, 'Film retrieved successfully', true);
         } catch (Exception $e) {
             Log::error('Exception in getFilmById', ['id' => $id, 'message' => $e->getMessage()]);

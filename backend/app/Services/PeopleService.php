@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Dtos\ListDTO;
 use Illuminate\Support\Facades\Http;
 use App\Dtos\PeopleDTO;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Exception;
 use App\Http\Response\ServiceResponse;
@@ -14,10 +13,13 @@ class PeopleService
 {
     protected $swapiBaseUrl;
     protected $swapiPeopleUrl;
-    public function __construct()
+    protected $cacheService;
+
+    public function __construct(CacheService $cacheService)
     {
         $this->swapiBaseUrl = env('APP_SWAPI_URL');
         $this->swapiPeopleUrl = "{$this->swapiBaseUrl}people/";
+        $this->cacheService = $cacheService;
     }
 
     public function getPeopleBySearch(string $searchTerm): ServiceResponse
@@ -40,8 +42,11 @@ class PeopleService
             $listPeopleDTOArray = array_map(function ($person) {
                 $cacheKey = $person['uid'] ? 'list_person_id_' . $person['uid'] : null;
 
-                if ($cacheKey && ($cachedPerson = Cache::get($cacheKey))) {
-                    return $cachedPerson;
+                if ($cacheKey) {
+                    $cachedPerson = $this->cacheService->get($cacheKey);
+                    if ($cachedPerson) {
+                        return $cachedPerson;
+                    }
                 }
                 
                 $peopleListDto = new ListDTO(
@@ -50,7 +55,7 @@ class PeopleService
                 );
 
                 if ($cacheKey) {
-                    Cache::put($cacheKey, $peopleListDto, now()->addMinutes(10));
+                    $this->cacheService->set($cacheKey, $peopleListDto);
                 }
 
                 return $peopleListDto;
@@ -66,7 +71,8 @@ class PeopleService
     public function getPersonById(string $id): ServiceResponse
     {
         $cacheKey = 'person_id_' . $id;
-        $personDTO = Cache::get($cacheKey);
+        $personDTO = $this->cacheService->get($cacheKey);
+        
         if ($personDTO !== null) {
             return new ServiceResponse($personDTO, 'Person retrieved from cache', true);
         }
@@ -96,7 +102,7 @@ class PeopleService
                 $movieData
             );
 
-            Cache::put($cacheKey, $personDTO, now()->addMinutes(10));
+            $this->cacheService->set($cacheKey, $personDTO);
 
             return new ServiceResponse($personDTO, 'Person retrieved successfully', true);
         } catch (Exception $e) {

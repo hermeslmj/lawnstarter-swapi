@@ -3,24 +3,36 @@
 namespace Tests\Unit;
 
 use App\Services\PeopleService;
+use App\Services\CacheService;
 use App\Dtos\PeopleDTO;
 use App\Dtos\ListDTO;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
+use Mockery;
 
 class PeopleServiceTest extends TestCase
 {
     private PeopleService $peopleService;
+    private $mockCacheService;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->peopleService = new PeopleService();
+        $this->mockCacheService = Mockery::mock(CacheService::class);
+        $this->peopleService = new PeopleService($this->mockCacheService);
+    }
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
     }
 
     public function test_get_people_by_search_returns_success_response()
     {
+        $this->mockCacheService->shouldReceive('get')->andReturn(null);
+        $this->mockCacheService->shouldReceive('set')->andReturn(true);
+
         Http::fake([
             '*' => Http::response([
                 'result' => [
@@ -42,23 +54,40 @@ class PeopleServiceTest extends TestCase
         $this->assertEquals('Luke Skywalker', $response->data[0]->title);
     }
 
-    public function test_get_people_by_search_returns_error_on_api_failure()
+    public function test_get_people_by_search_returns_from_cache()
     {
+        $cachedPerson = new ListDTO('1', 'Luke Skywalker');
+        $this->mockCacheService
+            ->shouldReceive('get')
+            ->with('list_person_id_1')
+            ->andReturn($cachedPerson);
+
         Http::fake([
-            '*' => Http::response(null, 500)
+            '*' => Http::response([
+                'result' => [
+                    [
+                        'uid' => '1',
+                        'properties' => [
+                            'name' => 'Luke Skywalker'
+                        ]
+                    ]
+                ]
+            ], 200)
         ]);
 
         $response = $this->peopleService->getPeopleBySearch('luke');
 
-        $this->assertFalse($response->success);
-        $this->assertEquals([], $response->data);
+        $this->assertTrue($response->success);
+        $this->assertIsArray($response->data);
+        $this->assertInstanceOf(ListDTO::class, $response->data[0]);
+        $this->assertEquals('Luke Skywalker', $response->data[0]->title);
     }
 
     public function test_get_person_by_id_returns_from_cache()
     {
         $cachedPerson = new PeopleDTO('1', 'Luke Skywalker', 'male', 'blue', 'blond', '172', '77', '19BBY', []);
-        Cache::shouldReceive('get')
-            ->once()
+        $this->mockCacheService
+            ->shouldReceive('get')
             ->with('person_id_1')
             ->andReturn($cachedPerson);
 
@@ -71,8 +100,8 @@ class PeopleServiceTest extends TestCase
 
     public function test_get_person_by_id_returns_from_api()
     {
-        Cache::shouldReceive('get')->andReturn(null);
-        Cache::shouldReceive('put')->once();
+        $this->mockCacheService->shouldReceive('get')->andReturn(null);
+        $this->mockCacheService->shouldReceive('set')->once()->andReturn(true);
 
         Http::fake([
             '*' => Http::response([
@@ -101,7 +130,8 @@ class PeopleServiceTest extends TestCase
 
     public function test_get_person_by_id_returns_error_on_api_failure()
     {
-        Cache::shouldReceive('get')->andReturn(null);
+        $this->mockCacheService->shouldReceive('get')->andReturn(null);
+
         Http::fake([
             '*' => Http::response(null, 404)
         ]);
