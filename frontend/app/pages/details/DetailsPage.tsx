@@ -43,7 +43,7 @@ const DetailsPage: React.FC = () => {
     }, [type, id]);
 
     if (loading) {
-        return  <div className="flex items-center justify-center min-h-screen m-auto">
+        return  <div className="flex items-center justify-center min-h-screen m-auto min-h-[40vh] ">
                     <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
                 </div>;
     }
@@ -87,7 +87,7 @@ const DetailsPage: React.FC = () => {
     const renderRelated = () => {
         if (isPeopleDTO(details) && details.movies && details.movies.length > 0) {
             return (
-                <div className="related-section">
+                <div className="related-section flex-1 w-full lg:w-2/5 md:w-full">
                     <h3>Movies</h3>
                     <ul>
                         {details.movies.map((movie) => {
@@ -104,7 +104,7 @@ const DetailsPage: React.FC = () => {
             );
         } else if (isFilmDTO(details) && details.characters && details.characters.length > 0) {
             return (
-                <div className="related-section flex-1">
+                <div className="related-section flex-1 w-full lg:w-2/5 md:w-full">
                     <h3>Characters</h3>
                     <ul>
                         {details.characters.map((character) => {
@@ -132,7 +132,7 @@ const DetailsPage: React.FC = () => {
                 </h1>
             </div>
             <div className="content-wrapper flex flex-wrap">
-                <div className="details-section">
+                <div className="details-section flex-1 lg:w-1/2 md:w-full">
                     {renderDetails()}
                 </div>
 

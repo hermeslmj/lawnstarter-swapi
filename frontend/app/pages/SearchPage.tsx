@@ -73,7 +73,7 @@ const SearchPage: React.FC = () => {
                 loading={loading}
               />
             </div>
-            <div className="results-section w-full h-3/5 md:w-2/3">
+            <div className="results-section w-full md:w-2/3">
               {loading && 
                 <div className="grid h-full grid-cols-1 content-center m-auto">
                   <div className="text-center text-gray-600">

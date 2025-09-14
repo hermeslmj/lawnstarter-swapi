@@ -9,11 +9,11 @@
 .main-title {
     font-size: 18px;
     font-weight: bold;
+    margin: 15px;
 }
 .content-wrapper {
     justify-content: space-between;
     margin-bottom: 40px;
-    flex-wrap: wrap; 
 }
 .details-section,
 .related-section {
@@ -50,7 +50,7 @@
     text-decoration: underline;
 }
 .back-button {
-    padding: 12px 25px;
+    padding: 5px 25px;
     margin: 15px;
     background-color: #28a745;
     color: white;
@@ -58,6 +58,7 @@
     text-decoration: none;
     border-radius: 9999px;
     font-size: 12px;
+    font-weight: bold;
     transition: background-color 0.2s ease-in-out;
 }
 .back-button:hover {
