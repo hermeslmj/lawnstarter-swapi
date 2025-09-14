@@ -27,7 +27,7 @@ class PeopleService
                 'name' => $searchTerm
             ]);
 
-            if (!$response->successful()) {
+            if (!$response || !$response->successful()) {
                 Log::error('Failed to fetch people from SWAPI', [
                     'status' => $response->status(),
                     'body' => $response->body()
@@ -118,7 +118,7 @@ class PeopleService
             });
 
             foreach ($responses as $response) {
-                if ($response->successful()) {
+                if (!$response || $response->successful()) {
                     $movieData = $response->json()['result'] ?? null;
                     if ($movieData) {
                         $movies[] = [

@@ -28,7 +28,7 @@ class FilmService
                 'title' => $searchTerm
             ]);
 
-            if (!$response->successful()) {
+            if (!$response || !$response->successful()) {
                 Log::error('Failed to fetch films from SWAPI', ['status' => $response->status(), 'body' => $response->body()]);
                 return new ServiceResponse([], 'Failed to fetch films', false);
             }
@@ -66,7 +66,7 @@ class FilmService
         
         try {
             $response = Http::get("{$this->swapiFilmsUrl}{$id}");
-            if (!$response->successful()) {
+            if (!$response || !$response->successful()) {
                 Log::error('Failed to fetch film by id from SWAPI', ['id' => $id, 'status' => $response->status(), 'body' => $response->body()]);
                 return new ServiceResponse(null, 'Film not found', false, 404);
             }
@@ -92,7 +92,7 @@ class FilmService
     {
         $people = [];
         try {
-            $response = Http::pool(function ($pool) use ($personUrls) {
+            $responses = Http::pool(function ($pool) use ($personUrls) {
                 $requests = [];
                 foreach ($personUrls as $url) {
                     $requests[] = $pool->get($url);
@@ -100,15 +100,15 @@ class FilmService
                 return $requests;
             });
 
-            foreach ($response as $res) {
-                if ($res->successful()) {
-                    $personObj = json_decode($res->body(), true);
+            foreach ($responses as $response) {
+                if (!$response || $response->successful()) {
+                    $personObj = json_decode($response->body(), true);
                     $people[] = [
                         'uid' => $personObj['result']['uid'] ?? '',
                         'name' => $personObj['result']['properties']['name'] ?? ''
                     ];
                 } else {
-                    Log::warning('Failed to fetch person for film', ['status' => $res->status(), 'body' => $res->body()]);
+                    Log::warning('Failed to fetch person for film', ['status' => $response->status(), 'body' => $response->body()]);
                 }
             }
         } catch (Exception $e) {
