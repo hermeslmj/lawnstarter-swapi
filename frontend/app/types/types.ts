@@ -1,3 +1,5 @@
+import type { I } from "node_modules/react-router/dist/development/context-jKip1TFB.mjs";
+
 export type SearchType = 'people' | 'films';
 
 export interface SearchResult {
@@ -57,3 +59,8 @@ export type SearchFormProps = {
 }
 
 export type ItemDetails = PeopleDTO | FilmDTO;
+
+export type HttpResponse = {
+    code: number;
+    content: ListDTO[] | PeopleDTO | FilmDTO | ItemDetails;
+}

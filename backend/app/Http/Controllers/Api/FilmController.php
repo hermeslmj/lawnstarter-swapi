@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Response\ApiResponse;
 use Illuminate\Http\Request;
 use App\Services\FilmService;
 use App\Models\QueryLogs;
@@ -22,16 +23,26 @@ class FilmController extends Controller
     public function index(Request $request)
     {
         $start = microtime(true);
-        $response = $this->filmService->getFilmsBySearch($request->query('searchTerm', ''));
-        $end = microtime(true);
-        $executionTime = $end - $start;
+        
+        try {
+            $serviceResponse = $this->filmService->getFilmsBySearch($request->query('searchTerm', ''));
+            
+            $end = microtime(true);
+            $executionTime = $end - $start;
 
-        $queryLog = new QueryLogs();
-        $queryLog->query = $request->fullUrl();
-        $queryLog->execution_time = number_format($executionTime, 5);
-        $queryLog->save();
+            $queryLog = new QueryLogs();
+            $queryLog->query = $request->fullUrl();
+            $queryLog->execution_time = number_format($executionTime, 5);
+            $queryLog->save();
 
-        return response()->json($response);
+            if (!$serviceResponse->success) {
+                return ApiResponse::error($serviceResponse->message, $serviceResponse->code);
+            }
+
+            return ApiResponse::success($serviceResponse->data);
+        } catch (\Exception $e) {
+            return ApiResponse::error('An unexpected error occurred', 500);
+        }
     }
 
     /**
@@ -40,17 +51,25 @@ class FilmController extends Controller
     public function show(Request $request)
     {
         $start = microtime(true);
-        $response = $this->filmService->getFilmById($request->query('id',''));
-        $end = microtime(true);
-        $executionTime = $end - $start;
-
-        $queryLog = new QueryLogs();
-        $queryLog->query = $request->fullUrl();
-        $queryLog->execution_time = number_format($executionTime, 5);
-        $queryLog->save();
-
-        return response()->json($response);
-    }
-   
         
+        try {
+            $serviceResponse = $this->filmService->getFilmById($request->query('id', ''));
+            
+            $end = microtime(true);
+            $executionTime = $end - $start;
+
+            $queryLog = new QueryLogs();
+            $queryLog->query = $request->fullUrl();
+            $queryLog->execution_time = number_format($executionTime, 5);
+            $queryLog->save();
+
+            if (!$serviceResponse->success) {
+                return ApiResponse::error($serviceResponse->message, $serviceResponse->code);
+            }
+
+            return ApiResponse::success($serviceResponse->data);
+        } catch (\Exception $e) {
+            return ApiResponse::error('An unexpected error occurred', 500);
+        }
+    }
 }

@@ -1,9 +1,11 @@
 import React from 'react';
-import type { SearchResult, SearchResultsProps } from '../../types/types';
+import { useNavigate } from 'react-router';
+import type { SearchResultsProps } from '../../types/types';
 import SearchResultsRow from '../SearchResultsRows/SearchResultsRows';
 import './SearchResults.css';
 
 const SearchResults: React.FC<SearchResultsProps> = ({ results, type }) => {
+  const navigate = useNavigate();
 
   return (
     <div className="search-results-container">
@@ -23,11 +25,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, type }) => {
               <SearchResultsRow
                 key={item.id}
                 name={item.name}
-                onViewDetails={
-                  () => {
-                    window.location.href = `/details/${type}/${item.id}`;
-                  }
-                }
+                onViewDetails={() => navigate(`/details/${type}/${item.id}`)}
               />
             ))}
           </div>

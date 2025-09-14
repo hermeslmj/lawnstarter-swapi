@@ -6,10 +6,9 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Exception;
-
 use App\Dtos\FilmDTO;
-use App\DTOs\PeopleDTO;
 use App\Dtos\ListDTO;
+use App\Http\Response\ServiceResponse;
 
 class FilmService
 {
@@ -22,7 +21,7 @@ class FilmService
         $this->swapiFilmsUrl = "{$this->swapiBaseUrl}films/";
     }
 
-    public function getFilmsBySearch(string $searchTerm): array
+    public function getFilmsBySearch(string $searchTerm): ServiceResponse
     {
         try {
             $response = Http::get($this->swapiFilmsUrl, [
@@ -31,7 +30,7 @@ class FilmService
 
             if (!$response->successful()) {
                 Log::error('Failed to fetch films from SWAPI', ['status' => $response->status(), 'body' => $response->body()]);
-                return [];
+                return new ServiceResponse([], 'Failed to fetch films', false);
             }
 
             $filmsListObj = json_decode($response->body(), true);
@@ -50,26 +49,28 @@ class FilmService
                 return $listFilmDto;
             }, $filmsListObj['result'] ?? []);
 
-            return $filmDTOArray;
+            return new ServiceResponse($filmDTOArray, 'Films retrieved successfully', true);
         } catch (Exception $e) {
             Log::error('Exception in getFilmsBySearch', ['message' => $e->getMessage()]);
-            return [];
+            return new ServiceResponse([], 'An error occurred while fetching films', false);
         }
     }
 
-    public function getFilmById(string $id)
+    public function getFilmById(string $id): ServiceResponse
     {
         $cacheKey = 'film_id_' . $id;
         $filmDTO = Cache::get($cacheKey);
         if ($filmDTO !== null) {
-            return $filmDTO;
+            return new ServiceResponse($filmDTO, 'Film retrieved from cache', true);
         }
+        
         try {
             $response = Http::get("{$this->swapiFilmsUrl}{$id}");
             if (!$response->successful()) {
                 Log::error('Failed to fetch film by id from SWAPI', ['id' => $id, 'status' => $response->status(), 'body' => $response->body()]);
-                return null;
+                return new ServiceResponse(null, 'Film not found', false, 404);
             }
+            
             $filmObj = json_decode($response->body(), true);
             $characterData = $this->_getPersonDataForFilm($filmObj['result']['properties']['characters'] ?? []);
             $filmDTO = new FilmDTO(
@@ -78,11 +79,12 @@ class FilmService
                 $filmObj['result']['properties']['opening_crawl'] ?? '',
                 $characterData ?? []
             );
+            
             Cache::put($cacheKey, $filmDTO, now()->addMinutes(10));
-            return $filmDTO;
+            return new ServiceResponse($filmDTO, 'Film retrieved successfully', true);
         } catch (Exception $e) {
             Log::error('Exception in getFilmById', ['id' => $id, 'message' => $e->getMessage()]);
-            return null;
+            return new ServiceResponse(null, 'An error occurred while fetching the film', false, 500);
         }
     }
 

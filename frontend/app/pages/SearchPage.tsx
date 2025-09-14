@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SearchForm from '../components/SearchForm/SearchForm';
 import SearchResults from '../components/SearchResults/SearchResults';
-import type { SearchType, SearchResult, PeopleDTO, FilmDTO, ListDTO } from '../types/types';
+import type { SearchType, SearchResult, PeopleDTO, FilmDTO, ListDTO, HttpResponse } from '../types/types';
 import { httpRequest } from "~/helpers/HttpHelper";
 
 const SearchPage: React.FC = () => {
@@ -22,10 +22,11 @@ const SearchPage: React.FC = () => {
     if(type === 'films') {
       try {
         //TODO: url should be in a config file
-        await httpRequest<ListDTO[]>(`http://localhost/api/films/?searchTerm=${term}`).then((data) => {
+        await httpRequest<HttpResponse>(`http://localhost/api/films/?searchTerm=${term}`).then((data) => {
           var resultsArray: SearchResult[] = [];
-          if (data) {
-            data.map((film) => {
+          console.log(data);
+          if (data && Array.isArray(data.content)) {
+            data.content.map((film) => {
               resultsArray.push({ id: film.uid, name: film.title });
             });
           }
@@ -42,11 +43,11 @@ const SearchPage: React.FC = () => {
       try 
       {
         //TODO: url should be in a config file
-        await httpRequest<ListDTO[]>(`http://localhost/api/people/?searchTerm=${term}`)
+        await httpRequest<HttpResponse>(`http://localhost/api/people/?searchTerm=${term}`)
         .then((data) => {
           var resultsArray: SearchResult[] = [];
-          if (data) {
-            data.map((person) => {
+          if (data && Array.isArray(data.content)) {
+            data.content.map((person) => {
               resultsArray.push({ id: person.uid, name: person.title });
             });
           }

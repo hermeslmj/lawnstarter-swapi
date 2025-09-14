@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
-import type { PeopleDTO, FilmDTO, ItemDetails } from '~/types/types';
+import type { PeopleDTO, FilmDTO, ItemDetails, HttpResponse } from '~/types/types';
+import { httpRequest } from '~/helpers/HttpHelper';
 import './DetailsPage.css';
 
 
@@ -25,15 +26,12 @@ const DetailsPage: React.FC = () => {
                 setLoading(false);
                 return;
             }
+
             setLoading(true);
             setError(null);
             try {
-                const response = await fetch(`http://localhost/api/${type}/show?id=${id}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data: ItemDetails = await response.json();
-                setDetails(data);
+                const data = await httpRequest<HttpResponse>(`http://localhost/api/${type}/show?id=${id}`);
+                setDetails(data.content as ItemDetails);
             } catch (err: any) {
                 setError(err.message);
             } finally {
@@ -93,7 +91,7 @@ const DetailsPage: React.FC = () => {
                         {details.movies.map((movie) => {
                             return (
                                 <span  key={movie.uid}>
-                                    <Link className='comma-list' to={`/details/films/${movie.uid}`}>
+                                    <Link to={`/details/films/${movie.uid}`}>
                                         {movie.title}
                                     </Link>
                                 </span>
@@ -110,7 +108,7 @@ const DetailsPage: React.FC = () => {
                         {details.characters.map((character) => {
                             return (
                                 <span key={character.uid}>
-                                    <Link className='comma-list' to={`/details/people/${character.uid}`}>
+                                    <Link to={`/details/people/${character.uid}`}>
                                         {character.name}
                                     </Link>
                                 </span>

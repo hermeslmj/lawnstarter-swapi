@@ -8,6 +8,7 @@ use App\Dtos\PeopleDTO;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use App\Http\Response\ServiceResponse;
 
 class PeopleService
 {
@@ -19,7 +20,7 @@ class PeopleService
         $this->swapiPeopleUrl = "{$this->swapiBaseUrl}people/";
     }
 
-    public function getPeopleBySearch(string $searchTerm): array
+    public function getPeopleBySearch(string $searchTerm): ServiceResponse
     {
         try {
             $response = Http::get($this->swapiPeopleUrl, [
@@ -31,7 +32,7 @@ class PeopleService
                     'status' => $response->status(),
                     'body' => $response->body()
                 ]);
-                return [];
+                return new ServiceResponse([], 'Failed to fetch people', false);
             }
 
             $peopleListObj = json_decode($response->body(), true);
@@ -54,19 +55,20 @@ class PeopleService
 
                 return $peopleListDto;
             }, $peopleListObj['result'] ?? []);
-            return $listPeopleDTOArray;
+
+            return new ServiceResponse($listPeopleDTOArray, 'People retrieved successfully', true);
         } catch (Exception $e) {
             Log::error('Exception in getPeopleBySearch', ['message' => $e->getMessage()]);
-            return [];
+            return new ServiceResponse([], 'An error occurred while fetching people', false, 500);
         }
     }
 
-    public function getPersonById(string $id)
+    public function getPersonById(string $id): ServiceResponse
     {
         $cacheKey = 'person_id_' . $id;
         $personDTO = Cache::get($cacheKey);
         if ($personDTO !== null) {
-            return $personDTO;
+            return new ServiceResponse($personDTO, 'Person retrieved from cache', true);
         }
 
         try {
@@ -77,8 +79,9 @@ class PeopleService
                     'status' => $response->status(),
                     'body' => $response->body()
                 ]);
-                return null;
+                return new ServiceResponse(null, 'Person not found', false, 404);
             }
+            
             $personObj = json_decode($response->body(), true);
             $movieData = $this->_getMoviesDataForPerson($personObj['result']['properties']['films'] ?? []);
             $personDTO = new PeopleDTO(
@@ -95,10 +98,10 @@ class PeopleService
 
             Cache::put($cacheKey, $personDTO, now()->addMinutes(10));
 
-            return $personDTO;
+            return new ServiceResponse($personDTO, 'Person retrieved successfully', true);
         } catch (Exception $e) {
             Log::error('Exception in getPersonById', ['id' => $id, 'message' => $e->getMessage()]);
-            return null;
+            return new ServiceResponse(null, 'An error occurred while fetching the person', false, 500);
         }
     }
 

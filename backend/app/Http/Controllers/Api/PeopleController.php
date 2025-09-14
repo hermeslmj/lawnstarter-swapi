@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Response\ApiResponse;
 use Illuminate\Http\Request;
-
 use App\Models\QueryLogs;
 use App\Services\PeopleService;
-
 
 class PeopleController extends Controller
 {
@@ -17,23 +16,33 @@ class PeopleController extends Controller
     {
         $this->peopleService = $peopleService;
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $queryLog = new QueryLogs();
         $start = microtime(true);
-        $response = $this->peopleService->getPeopleBySearch($request->query('searchTerm', ''));
-        $end = microtime(true);
-        $executionTime = $end - $start;
+        
+        try {
+            $serviceResponse = $this->peopleService->getPeopleBySearch($request->query('searchTerm', ''));
+            
+            $end = microtime(true);
+            $executionTime = $end - $start;
 
-        $queryLog->query = $request->fullUrl();;
-        $queryLog->execution_time = number_format($executionTime, 5);
-        $queryLog->save();
-        
-        
-        return response()->json($response);
+            $queryLog = new QueryLogs();
+            $queryLog->query = $request->fullUrl();
+            $queryLog->execution_time = number_format($executionTime, 5);
+            $queryLog->save();
+
+            if (!$serviceResponse->success) {
+                return ApiResponse::error($serviceResponse->message, $serviceResponse->code);
+            }
+
+            return ApiResponse::success($serviceResponse->data);
+        } catch (\Exception $e) {
+            return ApiResponse::error('An unexpected error occurred', 500);
+        }
     }
 
     /**
@@ -41,14 +50,26 @@ class PeopleController extends Controller
      */
     public function show(Request $request)
     {
-        $queryLog = new QueryLogs();
         $start = microtime(true);
-        $response = $this->peopleService->getPersonById($request->query('id',''));
-        $end = microtime(true);
-        $executionTime = $end - $start;
-        $queryLog->query = $request->fullUrl();
-        $queryLog->execution_time = number_format($executionTime, 5);
-        $queryLog->save();
-        return response()->json($response);
+        
+        try {
+            $serviceResponse = $this->peopleService->getPersonById($request->query('id', ''));
+            
+            $end = microtime(true);
+            $executionTime = $end - $start;
+
+            $queryLog = new QueryLogs();
+            $queryLog->query = $request->fullUrl();
+            $queryLog->execution_time = number_format($executionTime, 5);
+            $queryLog->save();
+
+            if (!$serviceResponse->success) {
+                return ApiResponse::error($serviceResponse->message, $serviceResponse->code);
+            }
+
+            return ApiResponse::success($serviceResponse->data);
+        } catch (\Exception $e) {
+            return ApiResponse::error('An unexpected error occurred', 500);
+        }
     }
 }
