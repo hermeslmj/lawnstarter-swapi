@@ -2,27 +2,23 @@
     background-color: white;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 30px;
+    padding: 15px;
     margin: 0px auto;
-    max-width: 900px;
+    
 }
 .main-title {
     font-size: 18px;
     font-weight: bold;
 }
 .content-wrapper {
-    display: flex;
     justify-content: space-between;
     margin-bottom: 40px;
     flex-wrap: wrap; 
 }
 .details-section,
 .related-section {
-    flex: 1;
-    min-width: 300px; 
     margin: 15px;
     background-color: white;
-    padding: 25px;
 }
 
 .details-section h3,

@@ -6,11 +6,11 @@ import './DetailsPage.css';
 
 
 function isPeopleDTO(obj: any): obj is PeopleDTO {
-  return obj && typeof obj === 'object' && 'gender' in obj && 'eyecolor' in obj;
+    return obj && typeof obj === 'object' && 'gender' in obj && 'eyecolor' in obj;
 }
 
 function isFilmDTO(obj: any): obj is FilmDTO {
-  return obj && typeof obj === 'object' && 'openingCrawl' in obj;
+    return obj && typeof obj === 'object' && 'openingCrawl' in obj;
 }
 
 const DetailsPage: React.FC = () => {
@@ -43,7 +43,9 @@ const DetailsPage: React.FC = () => {
     }, [type, id]);
 
     if (loading) {
-        return <div className="details-page-container flex items-center justify-center min-h-[40vh] text-lg text-gray-600">Loading...</div>;
+        return  <div className="flex items-center justify-center min-h-screen m-auto">
+                    <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>;
     }
 
     if (error) {
@@ -51,7 +53,7 @@ const DetailsPage: React.FC = () => {
     }
 
     if (!details) {
-        return <div className="details-page-container flex items-center justify-center min-h-[40vh] text-lg text-gray-600">No details found.</div>;
+        return <div className="details-page-containerflex items-center justify-center min-h-[40vh] text-lg text-gray-600">No details found.</div>;
     }
 
     const renderDetails = () => {
@@ -90,7 +92,7 @@ const DetailsPage: React.FC = () => {
                     <ul>
                         {details.movies.map((movie) => {
                             return (
-                                <span  key={movie.uid}>
+                                <span key={movie.uid}>
                                     <Link to={`/details/films/${movie.uid}`}>
                                         {movie.title}
                                     </Link>
@@ -102,7 +104,7 @@ const DetailsPage: React.FC = () => {
             );
         } else if (isFilmDTO(details) && details.characters && details.characters.length > 0) {
             return (
-                <div className="related-section">
+                <div className="related-section flex-1">
                     <h3>Characters</h3>
                     <ul>
                         {details.characters.map((character) => {
@@ -123,21 +125,22 @@ const DetailsPage: React.FC = () => {
 
 
     return (
-        <div className="details-page-container">
+        <div className="details-page-container h-fit w-full max-w-3/5">
             <div>
                 <h1 className="main-title">
                     {isFilmDTO(details) ? details.title : details.name}
-                </h1>    
+                </h1>
             </div>
-            <div className="content-wrapper">
+            <div className="content-wrapper flex flex-wrap">
                 <div className="details-section">
                     {renderDetails()}
                 </div>
 
-                { renderRelated()}
+                {renderRelated()}
             </div>
-
-            <Link to="/" className="back-button">BACK TO SEARCH</Link>
+            <div className="back-link">
+                    <Link to="/" className="back-button">BACK TO SEARCH</Link>
+            </div>
         </div>
     );
 };

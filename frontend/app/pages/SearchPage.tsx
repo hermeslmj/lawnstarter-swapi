@@ -73,8 +73,14 @@ const SearchPage: React.FC = () => {
                 loading={loading}
               />
             </div>
-            <div className="results-section w-full md:w-2/3">
-              {loading && <p className="text-center text-gray-500">Searching...</p>}
+            <div className="results-section w-full h-3/5 md:w-2/3">
+              {loading && 
+                <div className="grid h-full grid-cols-1 content-center m-auto">
+                  <div className="text-center text-gray-600">
+                    <p className="text-lg mb-2">Searching...</p>
+                  </div>
+                </div>  
+              }
               {error && <p className="error-message text-red-600 text-center">{error}</p>}
               {!loading && !error && (
                 <SearchResults results={results} type={searchType}  />
