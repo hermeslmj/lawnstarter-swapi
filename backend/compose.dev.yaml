@@ -14,9 +14,10 @@ services:
       - NGINX_HOST=localhost
     networks:
       - laravel-development
+    restart: on-failure
     depends_on:
       php-fpm:
-        condition: service_started  # Wait for php-fpm to start
+        condition: service_healthy  # Wait for php-fpm health check
 
   php-fpm:
     # For the php-fpm service, we will create a custom image to install the necessary PHP extensions and setup proper permissions.
@@ -41,6 +42,11 @@ services:
     volumes:
       # Mount the application code for live updates
       - ./:/var/www
+    healthcheck:
+      test: ["CMD-SHELL", "php-fpm-healthcheck || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - laravel-development
     depends_on:
@@ -93,7 +99,7 @@ services:
 
     # Queue Worker Service
   laravel-queue-worker:
-    container_name: laravel-queue-worker
+    container_name: swapi-queue-worker
     build:
       context: .
       dockerfile: ./docker/common/php-fpm/Dockerfile
@@ -116,7 +122,7 @@ services:
     
   # Scheduler Service
   laravel-scheduler-worker:
-    container_name: laravel-scheduler-worker
+    container_name: swapi-scheduler-worker
     build:
       context: .
       dockerfile: ./docker/common/php-fpm/Dockerfile
@@ -150,7 +156,8 @@ services:
     networks:
       - laravel-development
     depends_on:
-      - php-fpm
+      php-fpm:
+        condition: service_healthy  # Wait for php-fpm health check
 
 networks:
   laravel-development:
