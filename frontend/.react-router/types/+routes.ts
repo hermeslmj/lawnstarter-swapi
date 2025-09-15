@@ -19,16 +19,19 @@ type Pages = {
       "id": string;
     };
   };
+  "/statistics": {
+    params: {};
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/details/:type/:id";
+    page: "/" | "/details/:type/:id" | "/statistics";
   };
   "./pages/layout/PageLayout.tsx": {
     id: "pages/layout/PageLayout";
-    page: "/" | "/details/:type/:id";
+    page: "/" | "/details/:type/:id" | "/statistics";
   };
   "pages/SearchPage.tsx": {
     id: "pages/SearchPage";
@@ -37,5 +40,9 @@ type RouteFiles = {
   "pages/details/DetailsPage.tsx": {
     id: "pages/details/DetailsPage";
     page: "/details/:type/:id";
+  };
+  "pages/statistics/StatisticsPage.tsx": {
+    id: "pages/statistics/StatisticsPage";
+    page: "/statistics";
   };
 };

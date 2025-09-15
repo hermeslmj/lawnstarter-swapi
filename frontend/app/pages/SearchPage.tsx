@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SearchForm from '../components/SearchForm/SearchForm';
 import SearchResults from '../components/SearchResults/SearchResults';
 import type { SearchType, SearchResult, PeopleDTO, FilmDTO, ListDTO, HttpResponse } from '../types/types';
-import { httpRequest } from "~/helpers/HttpHelper";
+import { httpRequest } from "../helpers/HttpHelper";
 
 const SearchPage: React.FC = () => {
   const [searchType, setSearchType] = useState<SearchType>('people');

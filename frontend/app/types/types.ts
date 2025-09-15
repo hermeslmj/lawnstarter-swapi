@@ -64,3 +64,10 @@ export type HttpResponse = {
     code: number;
     content: ListDTO[] | PeopleDTO | FilmDTO | ItemDetails;
 }
+
+export type Statistics = {
+    id: number;
+    description: string;
+    title: string;
+    value: Array<any>;
+}
