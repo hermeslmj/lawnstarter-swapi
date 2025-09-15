@@ -42,6 +42,7 @@ services:
     volumes:
       # Mount the application code for live updates
       - ./:/var/www
+      - /var/www/vendor
     healthcheck:
       test: ["CMD-SHELL", "php-fpm-healthcheck || exit 1"]
       interval: 10s
