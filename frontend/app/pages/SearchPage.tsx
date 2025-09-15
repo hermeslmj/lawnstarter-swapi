@@ -10,6 +10,7 @@ const SearchPage: React.FC = () => {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const API_URL = 'http://localhost/api';
 
   const handleSearch = async (type: SearchType, term: string) => {
     setSearchType(type);
@@ -21,8 +22,7 @@ const SearchPage: React.FC = () => {
 
     if(type === 'films') {
       try {
-        //TODO: url should be in a config file
-        await httpRequest<HttpResponse>(`http://localhost/api/films/?searchTerm=${term}`).then((data) => {
+        await httpRequest<HttpResponse>(`${API_URL}/films/?searchTerm=${term}`).then((data) => {
           var resultsArray: SearchResult[] = [];
           console.log(data);
           if (data && Array.isArray(data.content)) {
@@ -40,15 +40,13 @@ const SearchPage: React.FC = () => {
       }
     }
     if(type === 'people'){
-      try 
-      {
-        //TODO: url should be in a config file
-        await httpRequest<HttpResponse>(`http://localhost/api/people/?searchTerm=${term}`)
-        .then((data) => {
-          var resultsArray: SearchResult[] = [];
-          if (data && Array.isArray(data.content)) {
-            data.content.map((person) => {
-              resultsArray.push({ id: person.uid, name: person.title });
+      try {
+        await httpRequest<HttpResponse>(`${API_URL}/people/?searchTerm=${term}`)
+          .then((data) => {
+            var resultsArray: SearchResult[] = [];
+            if (data && Array.isArray(data.content)) {
+              data.content.map((person) => {
+                resultsArray.push({ id: person.uid, name: person.title });
             });
           }
           setResults(resultsArray);
@@ -73,7 +71,11 @@ const SearchPage: React.FC = () => {
                 loading={loading}
               />
             </div>
-            <div className="results-section w-full md:w-2/3">
+            
+            <div className="results-section min-h-1/2 w-full md:w-2/3">
+              <div className="bg-white p-4">
+                <h1 className="text-2xl font-bold text-black-800 border-b border-gray-200">Results</h1>
+              </div>
               {loading && 
                 <div className="grid h-full grid-cols-1 content-center m-auto">
                   <div className="text-center text-gray-600">
