@@ -6,7 +6,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 const isTest = process.env.VITEST === "test"
 
 export default defineConfig({
-  plugins: [tailwindcss(),isTest && reactRouter(), tsconfigPaths()],
+  plugins: [tailwindcss(), isTest && reactRouter(), tsconfigPaths()],
   test: {
     globals: true,
     setupFiles: './app/tests/setup.ts',
