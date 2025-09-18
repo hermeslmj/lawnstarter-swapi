@@ -3,10 +3,9 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
-const isTest = process.env.VITEST === "test"
-
+const isTest = process.env.VITEST == "true" ? true : false;
 export default defineConfig({
-  plugins: [tailwindcss(), isTest && reactRouter(), tsconfigPaths()],
+  plugins: [tailwindcss(), !isTest && reactRouter(), tsconfigPaths()],
   test: {
     globals: true,
     setupFiles: './app/tests/setup.ts',
